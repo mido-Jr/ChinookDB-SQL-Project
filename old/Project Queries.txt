@@ -1,0 +1,113 @@
+#######################################################################################
+
+###SQL: Question Set 1###
+
+Question 1: Which countries have the most Invoices?
+
+SELECT BillingCountry,
+       count(InvoiceId) AS Invoices
+FROM Invoice
+GROUP BY 1
+ORDER BY 2 DESC,
+         1
+
+Question 2: Which city has the best customers?
+
+SELECT BillingCity,
+       sum(total) AS total_sum
+FROM Invoice
+GROUP BY 1
+ORDER BY 2 DESC,
+         1
+LIMIT 1
+
+Question 3: Who is the best customer?
+
+SELECT CustomerId,
+       sum(total) AS total_sum
+FROM Invoice
+INNER JOIN Customer USING (CustomerId)
+GROUP BY 1
+ORDER BY 2 DESC,
+         1
+LIMIT 1 
+
+#######################################################################################
+
+###SQL: Question Set 2###
+
+Question 1: Customer, Invoice, InvoiceLine, Track
+
+SELECT DISTINCT Email,
+                FirstName,
+                LastName,
+                G.Name
+FROM Customer
+INNER JOIN Invoice USING (CustomerId)
+INNER JOIN InvoiceLine USING (InvoiceId)
+INNER JOIN Track USING (TrackId)
+INNER JOIN Genre AS G USING (GenreId)
+WHERE G.Name = 'Rock'
+ORDER BY Email
+
+Question 2: Who is writing the rock music?
+
+SELECT DISTINCT ArtistId,
+                A.Name,
+                count(T.Name) AS Songs
+FROM Artist AS A
+INNER JOIN Album USING (ArtistId)
+INNER JOIN Track AS T USING (AlbumId)
+INNER JOIN Genre AS G USING (GenreId)
+WHERE G.Name = 'Rock'
+GROUP BY 1
+ORDER BY 3 DESC
+LIMIT 10
+
+
+Question 3
+First, find which artist has earned the most according to the InvoiceLines?
+
+SELECT Artist.Name,
+       sum(InvoiceLine.Quantity*InvoiceLine.UnitPrice) AS AmountSpent,
+       CustomerId,
+       FirstName,
+       LastName
+FROM Invoice
+INNER JOIN InvoiceLine USING (InvoiceId)
+INNER JOIN Track USING (TrackId)
+INNER JOIN Customer USING (CustomerId)
+INNER JOIN Album USING (AlbumId)
+INNER JOIN Artist USING (ArtistId)
+WHERE Artist.Name = 'Iron Maiden'
+GROUP BY 3
+ORDER BY 2 DESC,
+         FirstName,
+         LastName
+
+#######################################################################################
+
+###(Advanced) SQL: Question Set 3###
+
+Question 2
+Return all the track names that have a song length longer than the average song length
+
+SELECT Track.Name,
+       Track.Milliseconds
+FROM Track
+WHERE Track.Milliseconds >
+    (SELECT AVG(Milliseconds)
+     FROM Track)
+ORDER BY Track.Milliseconds DESC;
+
+
+Question 2
+A query that shows the total number of tracks in each playlist
+
+SELECT p.Name,
+       COUNT(pt.TrackId) AS "Number Of Tracks"
+FROM Playlist p
+JOIN PlaylistTrack pt USING(PlaylistId)
+GROUP BY p.name;
+
+
